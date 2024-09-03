@@ -108,7 +108,6 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	private void expandCapacity(int minCapacity) {
 		this.values = new char[minCapacity];
-		this.count = this.values.length;
 	}
 
 	@Override
@@ -416,7 +415,10 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	@Override
 	public AbstractStringBuilder replace(int start, int end, char replacement) {
-		return substring(0, start).append(replacement).append(substring(end));
+		StringBuilders sb = (StringBuilders) substring(0, start);
+		sb.append(replacement);
+		sb.append(substring(end));
+		return sb;
 	}
 
 	@Override
@@ -446,7 +448,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	@Override
 	public AbstractStringBuilder replace(char target, int position, char replacement, int replacementCount, int start, int end) {
-		char[] oldCharacters = this.values;
+		char[] oldCharacters = Arrays.copyOfRange(values, offset, count);
 		for (int i = start; i < end; i++) {
 			if (oldCharacters[i] == target) {
 				if (position == 0 && replacementCount != 0) {
@@ -458,6 +460,27 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 			}
 		}
 		return new StringBuilders(oldCharacters, offset, count);
+	}
+
+	@Override
+	public InterfaceStringBuilder replaceFirst(char target, char replacement) {
+		return replaceFirst(target, 0, replacement);
+	}
+
+	@Override
+	public InterfaceStringBuilder replaceFirst(char target,  int position, char replacement) {
+		return replace(target, position, replacement, 1);
+	}
+
+	@Override
+	public InterfaceStringBuilder replaceLast(char target, char replacement) {
+		return replaceLast(target, 0, replacement);
+	}
+
+	@Override
+	public InterfaceStringBuilder replaceLast(char target, int position, char replacement) {
+		int index = reverseIndexOf(position, target);
+		return (index != -1) ? replace(index, index + 1, replacement) : this;
 	}
 
 	@Override
@@ -721,6 +744,35 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
+	public AbstractStringBuilder repeat(int count) {
+		count++;
+		char[] oldValues = this.values;
+		expandCapacity(count * oldValues.length);
+		for (int i = 0, j = 0; i < values.length; i++, j++) {
+			if (j == oldValues.length) {
+				j = 0;
+			}
+			this.values[i] = oldValues[j];
+		}
+		return this;
+	}
+
+	@Override
+	public AbstractStringBuilder reverse() {
+		return reverse(0, this.count);
+	}
+
+	@Override
+	public AbstractStringBuilder reverse(int start, int end) {
+		for (int i = start, j = end - 1; i < j; i++, j--) {
+			char temp = this.values[i];
+			this.values[i] = this.values[j];
+			this.values[j] = temp;
+		}
+		return this;
+	}
+
+	@Override
 	public int indexOf(char ch) {
 		for (int i = 0; i < count; i++) {
 			if (values[i] == ch) {
@@ -910,7 +962,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	@Override
 	public int reverseIndexOf(int position, char ch, int offset, int start, int end) {
-		for (int i = end; i >= start + offset; i--) {
+		for (int i = end == this.count ? end - 1 : end; i >= start + offset; i--) {
 			if (values[i] == ch) {
 				if (position == 0) {
 					return i;
@@ -1240,6 +1292,6 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	@Override
 	public String toString() {
-		return new String(this.values, 0, this.count);
+		return new String(this.values);
 	}
 }

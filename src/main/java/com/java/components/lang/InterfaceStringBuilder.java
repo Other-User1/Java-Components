@@ -58,6 +58,12 @@ public interface InterfaceStringBuilder {
 	InterfaceStringBuilder replace(char target, int position, char replacement, int replacementCount);
 	InterfaceStringBuilder replace(char target, int position, char replacement, int replacementCount, int start, int end);
 
+	InterfaceStringBuilder replaceFirst(char target, char replacement);
+	InterfaceStringBuilder replaceFirst(char target, int position, char replacement);
+
+	InterfaceStringBuilder replaceLast(char target, char replacement);
+	InterfaceStringBuilder replaceLast(char target, int position, char replacement);
+
 	InterfaceStringBuilder substring(int start, int end);
 	InterfaceStringBuilder substring(int start);
 	InterfaceStringBuilder substr(int index, int length);
@@ -95,6 +101,11 @@ public interface InterfaceStringBuilder {
 	InterfaceStringBuilder join(String delimiter, CharSequence... args);
 	InterfaceStringBuilder join(String delimiter, int limit, CharSequence... args);
 	InterfaceStringBuilder join(String delimiter, String prefixDelimiter, String suffixDelimiter, String prefix, String suffix, int limit, CharSequence... args);
+
+	InterfaceStringBuilder repeat(int count);
+
+	InterfaceStringBuilder reverse();
+	InterfaceStringBuilder reverse(int start, int end);
 
 	int indexOf(char ch);
 	int indexOf(char ch, int offset);

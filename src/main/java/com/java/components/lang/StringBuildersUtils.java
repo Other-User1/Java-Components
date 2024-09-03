@@ -23,6 +23,7 @@ public class StringBuildersUtils {
 		int count = 0;
 		int start = begin;
 		int end;
+		int index = 0;
 
 		while ((end = sb.indexOf(str, offset + start)) != -1) {
 			if (end >= ending) {
@@ -31,10 +32,22 @@ public class StringBuildersUtils {
 			if (count == limit - 1) {
 				break;
 			}
-			if (!retainDelimiters) {
-				result[count++] = (StringBuilders) sb.substring(start, end);
+			if (index == 0) {
+				int tmp = start;
+				start = 0;
+				if (!retainDelimiters) {
+					result[count++] = (StringBuilders) sb.substring(start, end);
+				} else {
+					result[count++] = (StringBuilders) sb.substring(start, end + str.length());
+				}
+				start = tmp;
+				index++;
 			} else {
-				result[count++] = (StringBuilders) sb.substring(start, end + str.length());
+				if (!retainDelimiters) {
+					result[count++] = (StringBuilders) sb.substring(start, end);
+				} else {
+					result[count++] = (StringBuilders) sb.substring(start, end + str.length());
+				}
 			}
 			start = end + str.length();
 		}

@@ -125,6 +125,11 @@ public interface InterfaceStringBuilder {
 	int indexOf(int position, String str, int start, int end);
 	int indexOf(int position, String str, int offset, int start, int end);
 
+	int lastIndexOf(char ch);
+	int lastIndexOf(char ch, int formIndex);
+
+	int lastIndexOf(String str);
+
 	int reverseIndexOf(char ch);
 	int reverseIndexOf(char ch, int offset);
 	int reverseIndexOf(char ch, int start, int end);
@@ -142,6 +147,12 @@ public interface InterfaceStringBuilder {
 	int reverseIndexOf(int position, String str, int offset);
 	int reverseIndexOf(int position, String str, int start, int end);
 	int reverseIndexOf(int position, String str, int offset, int start, int end);
+
+	int[] indexOfAll(char ch);
+	// Integer[] indexOfAll(char ch, int start, int end);
+
+	int[] indexOfAll(String str);
+	// Integer[] indexOfAll(String str, int start, int end);
 
 	int length();
 	int size();
@@ -184,6 +195,9 @@ public interface InterfaceStringBuilder {
 
 	char getCharAt(int index);
 
+	char getFirstChar();
+	char getLastChar();
+
 	String toString();
 
 	char[] toCharArray();
@@ -198,4 +212,13 @@ public interface InterfaceStringBuilder {
 	Map<Integer, Character> toCharMap();
 	@Deprecated(since = "Use toByteArray()")
 	Map<Integer, Byte> toByteMap();
+
+	// ----- Extra methods ----- \\
+	InterfaceStringBuilder appendCodePoint(int codePoint);
+	InterfaceStringBuilder appendFirstCodePoint(int codePoint);
+
+	InterfaceStringBuilder replace(char oldChar, String newChar);
+	InterfaceStringBuilder replace(String oldStr, char newStr);
+
+	InterfaceStringBuilder[] split(String str, int limit, int offset, int begin, int ending, boolean retainDelimiters);
 }

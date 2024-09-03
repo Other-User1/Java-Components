@@ -19,6 +19,13 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		this.count = 0;
 	}
 
+	public AbstractStringBuilder(char ch) {
+		this.values = new char[this.capacity = 1];
+		this.values[0] = ch;
+		this.offset = 0;
+		this.count = 0;
+	}
+
 	public AbstractStringBuilder(String str) {
 		this.capacity = 0;
 		this.values = new char[str.length()];
@@ -1012,7 +1019,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public int reverseIndexOf(int position, String str, int offset, int start, int end) {
 		char[] chars = str.toCharArray();
-		for (int i = end == this.count ? this.count - 1 : end; i >= start; i--) {
+		for (int i = end == this.count ? this.count - 1 : end; i >= start + offset; i--) {
 			if (values[i] != chars[0]) {
 				continue;
 			}
@@ -1027,6 +1034,63 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 					}
 				}
 			}
+		}
+		return -1;
+	}
+
+	@Override
+	public int[] indexOfAll(char ch) {
+		List<Integer> list = new ArrayList<>();
+		for (int i = 0; i < count; i++) {
+			if (values[i] == ch) {
+				list.add(i);
+			}
+		}
+		return System.arrayCast(System.listToArray(list), new int[list.size()]);
+	}
+
+	@Override
+	public int[] indexOfAll(String str) {
+		List<Integer> list = new ArrayList<>();
+		for (int i = 0; i != -1; i = indexOf(str, i + str.length())) {
+			list.add(i);
+		}
+		return System.arrayCast(System.listToArray(list), new int[list.size()]);
+	}
+
+	@Override
+	public int lastIndexOf(char ch) {
+		int min = offset;
+
+		int position = offset + count - 1;
+		while ((--position) >= min) {
+			if (getCharAt(position) == ch) {
+				return position - offset;
+			}
+		}
+		return -1;
+	}
+
+	@Override
+	public int lastIndexOf(char ch, int formIndex) {
+		int min = offset;
+
+		for (int position = (offset + count - 1) - formIndex; position >= min; position--) {
+			if (getCharAt(position) == ch) {
+				return position - offset;
+			}
+		}
+		return -1;
+	}
+
+	@Override
+	public int lastIndexOf(String str) {
+		int min = offset;
+		int position = offset + count - str.length();
+		while ((--position) >= min) {
+			//if (equal(position, str)) {
+				return position - offset;
+			//}
 		}
 		return -1;
 	}
@@ -1237,6 +1301,16 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
+	public char getFirstChar() {
+		return this.values[0];
+	}
+
+	@Override
+	public char getLastChar() {
+		return this.values[count - 1];
+	}
+
+	@Override
 	public byte[] toByteArray() {
 		byte[] bytes = new byte[this.count];
 		for (int i = 0; i < this.count; i++) {
@@ -1293,5 +1367,78 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public String toString() {
 		return new String(this.values);
+	}
+
+	// ----- Extra Methods ----- \\
+	@Override
+	public AbstractStringBuilder appendCodePoint(int codePoint) {
+		return append((char) codePoint);
+	}
+
+	@Override
+	public InterfaceStringBuilder appendFirstCodePoint(int codePoint) {
+		return appendFirst((char) codePoint);
+	}
+
+	@Override
+	public InterfaceStringBuilder replace(char target, String replacement) {
+		return replace(new StringBuilders(target).toString(), replacement);
+	}
+
+	@Override
+	public InterfaceStringBuilder replace(String target, char replacement) {
+		return replace(target, new StringBuilders(replacement).toString());
+	}
+
+	@Override
+	public AbstractStringBuilder[] split(String str, int limit, int offset, int begin, int ending, boolean retainDelimiters) {
+		if (values == null || count == 0) {
+			throw new IllegalArgumentException("Invalid input");
+		}
+		StringBuilders sb = new StringBuilders(values);
+
+		limit++;
+
+		StringBuilders[] result = new StringBuilders[limit];
+		int count = 0;
+		int start = begin;
+		int end;
+		int index = 0;
+
+		while ((end = sb.indexOf(str, offset + start)) != -1) {
+			if (end >= ending) {
+				break;
+			}
+			if (count == limit - 1) {
+				break;
+			}
+			if (index == 0) {
+				int tmp = start;
+				start = 0;
+				if (!retainDelimiters) {
+					result[count++] = (StringBuilders) sb.substring(start, end);
+				} else {
+					result[count++] = (StringBuilders) sb.substring(start, end + str.length());
+				}
+				start = tmp;
+				index++;
+			} else {
+				if (!retainDelimiters) {
+					result[count++] = (StringBuilders) sb.substring(start, end);
+				} else {
+					result[count++] = (StringBuilders) sb.substring(start, end + str.length());
+				}
+			}
+			start = end + str.length();
+		}
+
+		result[count] = (StringBuilders) sb.substring(start);
+
+		if (count < limit - 1) {
+			StringBuilders[] trimmedResult = new StringBuilders[count + 1];
+			java.lang.System.arraycopy(result, 0, trimmedResult, 0, count + 1);
+			return trimmedResult;
+		}
+		return result;
 	}
 }

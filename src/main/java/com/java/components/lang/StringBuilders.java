@@ -6,6 +6,10 @@ public non-sealed class StringBuilders extends AbstractStringBuilder {
 		super();
 	}
 
+	public StringBuilders(char c) {
+		super(c);
+	}
+
 	public StringBuilders(String str) {
 		super(str);
 	}

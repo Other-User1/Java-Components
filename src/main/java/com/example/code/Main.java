@@ -12,7 +12,7 @@ public class Main {
 		sbs.appendCodePoint(33);
 		println(Arrays.toString(sbs.indexOfAll("He")));
 		println(STR."\{sbs.lastIndexOf('H', 6)}: lastIndexOf(ch, int)");
-		println(STR."\{sbs.reverseIndexOf(1, 'H', 7, 0, sbs.length())}: reverseIndexOf(ch, int)");
+		println(STR."\{sbs.reverseIndexOf(0, 'H', 7, 0, sbs.length())}: reverseIndexOf(ch, int)");
 		println(sbs);
 	}
 }

@@ -969,7 +969,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	@Override
 	public int reverseIndexOf(int position, char ch, int offset, int start, int end) {
-		for (int i = end == this.count ? end - 1 : end; i >= start + offset; i--) {
+		for (int i = (end == this.count ? end - 1 : end) - offset; i >= start; i--) {
 			if (values[i] == ch) {
 				if (position == 0) {
 					return i;
@@ -1019,7 +1019,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public int reverseIndexOf(int position, String str, int offset, int start, int end) {
 		char[] chars = str.toCharArray();
-		for (int i = end == this.count ? this.count - 1 : end; i >= start + offset; i--) {
+		for (int i = (end == this.count ? this.count - 1 : end) - offset; i >= start; i--) {
 			if (values[i] != chars[0]) {
 				continue;
 			}
@@ -1075,8 +1075,8 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	public int lastIndexOf(char ch, int formIndex) {
 		int min = offset;
 
-		for (int position = (offset + count - 1) - formIndex; position >= min; position--) {
-			if (getCharAt(position) == ch) {
+		for (int position = (offset + count - 1); position >= min + formIndex; position--) {
+			if (this.values[position] == ch) {
 				return position - offset;
 			}
 		}

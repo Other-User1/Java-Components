@@ -10,11 +10,7 @@ import static com.java.components.Prints.println;
 
 public class Main {
 	public static void main() {
-		StringBuilders sb = new StringBuilders("Hella--Helle--Helli--Hello--Hellu!");
-		println(sb.toLowerCase(Locale.ENGLISH));
-		println(sb);
-		String s = "Hella--Helle--Helli--Hello--Hellu!";
-		println(s.toLowerCase());
-		println(s);
+		StringBuilders sb = new StringBuilders("Hella--Helle--Helli--Hello--Hellu");
+		println(sb.substring(sb.reverseIndexOf(1, "He", 0, 0, sb.length())));
 	}
 }

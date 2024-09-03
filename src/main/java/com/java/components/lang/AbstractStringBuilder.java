@@ -108,6 +108,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	private void expandCapacity(int minCapacity) {
 		this.values = new char[minCapacity];
+		this.count = this.values.length;
 	}
 
 	@Override
@@ -265,6 +266,88 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public AbstractStringBuilder appendFirst(Object obj) {
 		return this.appendFirst(String.valueOf(obj));
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, String str) {
+		char[] oldCharacters = this.values;
+		char[] valuesStr = str.toCharArray();
+		expandCapacity(this.values.length + str.length());
+		for (int i = 0, j = 0; j < oldCharacters.length; i++, j++) {
+			if (i == index) {
+				for (int k = 0; k < str.length(); k++) {
+					this.values[i++] = valuesStr[k];
+				}
+			}
+			this.values[i] = oldCharacters[j];
+		}
+		return this;
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, char ch) {
+		char[] oldCharacters = this.values;
+		expandCapacity(this.values.length + 1);
+		for (int i = 0, j = 0; j < oldCharacters.length; i++, j++) {
+			if (i == index) {
+				this.values[i] = ch;
+				i++;
+			}
+			this.values[i] = oldCharacters[j];
+		}
+		return this;
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, byte b) {
+		return insert(index, String.valueOf(b));
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, short s) {
+		return insert(index, String.valueOf(s));
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, int i) {
+		return insert(index, String.valueOf(i));
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, long l) {
+		return insert(index, String.valueOf(l));
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, float f) {
+		return insert(index, String.valueOf(f));
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, double d) {
+		return insert(index, String.valueOf(d));
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, boolean b) {
+		if (b) {
+			insert(index, 't');
+			insert(index + 1, 'r');
+			insert(index + 2, 'u');
+			insert(index + 3, 'e');
+		} else {
+			insert(index, 'f');
+			insert(index + 1, 'a');
+			insert(index + 2, 'l');
+			insert(index + 3, 's');
+			insert(index + 4, 'e');
+		}
+		return this;
+	}
+
+	@Override
+	public InterfaceStringBuilder insert(int index, Object obj) {
+		return insert(index, String.valueOf(obj));
 	}
 
 	@Override
@@ -772,6 +855,112 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	public int indexOf(int position, String str, int offset, int start, int end) {
 		char[] chars = str.toCharArray();
 		for (int i = start + offset; i < end; i++) {
+			if (values[i] != chars[0]) {
+				continue;
+			}
+			for (int j = 0; j < chars.length; j++) {
+				if (values[i + j] != chars[j]) {
+					break;
+				} else if (j == chars.length - 1) {
+					if (position == 0) {
+						return i;
+					} else {
+						position--;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
+	@Override
+	public int reverseIndexOf(char ch) {
+		return reverseIndexOf(ch, 0);
+	}
+
+	@Override
+	public int reverseIndexOf(char ch, int offset) {
+		return reverseIndexOf(ch, offset, 0, this.count);
+	}
+
+	@Override
+	public int reverseIndexOf(char ch, int start, int end) {
+		return reverseIndexOf(ch, 0, start, end);
+	}
+
+	@Override
+	public int reverseIndexOf(char ch, int offset, int start, int end) {
+		return reverseIndexOf(0, ch, offset, start, end);
+	}
+
+	@Override
+	public int reverseIndexOf(int position, char ch) {
+		return reverseIndexOf(position, ch, 0);
+	}
+
+	@Override
+	public int reverseIndexOf(int position, char ch, int offset) {
+		return reverseIndexOf(position, ch, offset, 0, this.count);
+	}
+
+	@Override
+	public int reverseIndexOf(int position, char ch, int start, int end) {
+		return reverseIndexOf(position, ch, 0, start, end);
+	}
+
+	@Override
+	public int reverseIndexOf(int position, char ch, int offset, int start, int end) {
+		for (int i = end; i >= start + offset; i--) {
+			if (values[i] == ch) {
+				if (position == 0) {
+					return i;
+				} else {
+					position--;
+				}
+			}
+		}
+		return -1;
+	}
+
+	@Override
+	public int reverseIndexOf(String str) {
+		return reverseIndexOf(str, 0);
+	}
+
+	@Override
+	public int reverseIndexOf(String str, int offset) {
+		return reverseIndexOf(str, offset, 0, this.count);
+	}
+
+	@Override
+	public int reverseIndexOf(String str, int start, int end) {
+		return reverseIndexOf(str, 0, start, end);
+	}
+
+	@Override
+	public int reverseIndexOf(String str, int offset, int start, int end) {
+		return reverseIndexOf(0, str, offset, start, end);
+	}
+
+	@Override
+	public int reverseIndexOf(int position, String str) {
+		return reverseIndexOf(position, str, 0);
+	}
+
+	@Override
+	public int reverseIndexOf(int position, String str, int offset) {
+		return reverseIndexOf(position, str, 0, 0, this.count);
+	}
+
+	@Override
+	public int reverseIndexOf(int position, String str, int start, int end) {
+		return reverseIndexOf(position, str, 0, start, end);
+	}
+
+	@Override
+	public int reverseIndexOf(int position, String str, int offset, int start, int end) {
+		char[] chars = str.toCharArray();
+		for (int i = end == this.count ? this.count - 1 : end; i >= start; i--) {
 			if (values[i] != chars[0]) {
 				continue;
 			}

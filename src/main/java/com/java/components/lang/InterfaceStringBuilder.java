@@ -114,6 +114,24 @@ public interface InterfaceStringBuilder {
 	int indexOf(int position, String str, int start, int end);
 	int indexOf(int position, String str, int offset, int start, int end);
 
+	int reverseIndexOf(char ch);
+	int reverseIndexOf(char ch, int offset);
+	int reverseIndexOf(char ch, int start, int end);
+	int reverseIndexOf(char ch, int offset, int start, int end);
+	int reverseIndexOf(int position, char ch);
+	int reverseIndexOf(int position, char ch, int offset);
+	int reverseIndexOf(int position, char ch, int start, int end);
+	int reverseIndexOf(int position, char ch, int offset, int start, int end);
+
+	int reverseIndexOf(String str);
+	int reverseIndexOf(String str, int offset);
+	int reverseIndexOf(String str, int start, int end);
+	int reverseIndexOf(String str, int offset, int start, int end);
+	int reverseIndexOf(int position, String str);
+	int reverseIndexOf(int position, String str, int offset);
+	int reverseIndexOf(int position, String str, int start, int end);
+	int reverseIndexOf(int position, String str, int offset, int start, int end);
+
 	int length();
 	int size();
 

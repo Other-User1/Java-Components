@@ -20,6 +20,8 @@ public interface InterfaceStringBuilder {
 	InterfaceStringBuilder append(boolean b);
 	InterfaceStringBuilder append(Object obj);
 
+	InterfaceStringBuilder appendCodePoint(int codePoint);
+
 	InterfaceStringBuilder appendFirst(String str);
 	InterfaceStringBuilder appendFirst(char ch);
 	InterfaceStringBuilder appendFirst(byte b);
@@ -31,6 +33,8 @@ public interface InterfaceStringBuilder {
 	InterfaceStringBuilder appendFirst(boolean b);
 	InterfaceStringBuilder appendFirst(Object obj);
 
+	InterfaceStringBuilder appendFirstCodePoint(int codePoint);
+
 	InterfaceStringBuilder insert(int index, String str);
 	InterfaceStringBuilder insert(int index, char ch);
 	InterfaceStringBuilder insert(int index, byte b);
@@ -41,6 +45,8 @@ public interface InterfaceStringBuilder {
 	InterfaceStringBuilder insert(int index, double d);
 	InterfaceStringBuilder insert(int index, boolean b);
 	InterfaceStringBuilder insert(int index, Object obj);
+
+	InterfaceStringBuilder insertCodePoint(int index, int codePoint);
 
 	InterfaceStringBuilder replace(int start, int end, String replacement);
 	InterfaceStringBuilder replace(String target, String replacement);
@@ -65,8 +71,11 @@ public interface InterfaceStringBuilder {
 	InterfaceStringBuilder replaceLast(char target, int position, char replacement);
 
 	InterfaceStringBuilder substring(int start, int end);
+	InterfaceStringBuilder relativeSubstring(int start, int end);
 	InterfaceStringBuilder substring(int start);
+	InterfaceStringBuilder relativeSubstring(int start);
 	InterfaceStringBuilder substr(int index, int length);
+	InterfaceStringBuilder relativeSubstr(int index, int length);
 	InterfaceStringBuilder slide(int start, int end);
 	InterfaceStringBuilder slide(int start);
 
@@ -116,6 +125,15 @@ public interface InterfaceStringBuilder {
 	int indexOf(int position, char ch, int start, int end);
 	int indexOf(int position, char ch, int offset, int start, int end);
 
+	int relativeIndexOf(char ch);
+	int relativeIndexOf(char ch, int offset);
+	int relativeIndexOf(char ch, int start, int end);
+	int relativeIndexOf(char ch, int offset, int start, int end);
+	int relativeIndexOf(int position, char ch);
+	int relativeIndexOf(int position, char ch, int offset);
+	int relativeIndexOf(int position, char ch, int start, int end);
+	int relativeIndexOf(int position, char ch, int offset, int start, int end);
+
 	int indexOf(String str);
 	int indexOf(String str, int offset);
 	int indexOf(String str, int start, int end);
@@ -124,6 +142,15 @@ public interface InterfaceStringBuilder {
 	int indexOf(int position, String str, int offset);
 	int indexOf(int position, String str, int start, int end);
 	int indexOf(int position, String str, int offset, int start, int end);
+
+	int relativeIndexOf(String str);
+	int relativeIndexOf(String str, int offset);
+	int relativeIndexOf(String str, int start, int end);
+	int relativeIndexOf(String str, int offset, int start, int end);
+	int relativeIndexOf(int position,String str);
+	int relativeIndexOf(int position, String str, int offset);
+	int relativeIndexOf(int position, String str, int start, int end);
+	int relativeIndexOf(int position, String str, int offset, int start, int end);
 
 	int lastIndexOf(char ch);
 	int lastIndexOf(char ch, int formIndex);
@@ -149,10 +176,16 @@ public interface InterfaceStringBuilder {
 	int reverseIndexOf(int position, String str, int offset, int start, int end);
 
 	int[] indexOfAll(char ch);
-	// Integer[] indexOfAll(char ch, int start, int end);
+	int[] indexOfAll(char ch, int start, int end);
 
 	int[] indexOfAll(String str);
-	// Integer[] indexOfAll(String str, int start, int end);
+	int[] indexOfAll(String str, int start, int end);
+
+	int[] relativeIndexOfAll(char target);
+	int[] relativeIndexOfAll(char ch, int start, int end);
+
+	int[] relativeIndexOfAll(String target);
+	int[] relativeIndexOfAll(String str, int start, int end);
 
 	int length();
 	int size();
@@ -161,6 +194,8 @@ public interface InterfaceStringBuilder {
 
 	boolean isEmpty();
 	boolean isBlank();
+	boolean isEmptyOrBlank();
+	boolean isBlankOrEmpty();
 
 	boolean equal(AbstractStringBuilder abs);
 	boolean equalIgnoreCase(AbstractStringBuilder abs);
@@ -214,8 +249,6 @@ public interface InterfaceStringBuilder {
 	Map<Integer, Byte> toByteMap();
 
 	// ----- Extra methods ----- \\
-	InterfaceStringBuilder appendCodePoint(int codePoint);
-	InterfaceStringBuilder appendFirstCodePoint(int codePoint);
 
 	InterfaceStringBuilder replace(char oldChar, String newChar);
 	InterfaceStringBuilder replace(String oldStr, char newStr);

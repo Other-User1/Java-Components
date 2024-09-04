@@ -208,6 +208,11 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
+	public AbstractStringBuilder appendCodePoint(int codePoint) {
+		return append((char) codePoint);
+	}
+
+	@Override
 	public AbstractStringBuilder appendFirst(String str) {
 		if (str == null) {
 			str = "null";
@@ -272,6 +277,11 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public AbstractStringBuilder appendFirst(Object obj) {
 		return this.appendFirst(String.valueOf(obj));
+	}
+
+	@Override
+	public InterfaceStringBuilder appendFirstCodePoint(int codePoint) {
+		return appendFirst((char) codePoint);
 	}
 
 	@Override
@@ -354,6 +364,11 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public InterfaceStringBuilder insert(int index, Object obj) {
 		return insert(index, String.valueOf(obj));
+	}
+
+	@Override
+	public InterfaceStringBuilder insertCodePoint(int index, int codePoint) {
+		return insert(0, (char) codePoint);
 	}
 
 	@Override
@@ -497,13 +512,28 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
+	public InterfaceStringBuilder relativeSubstring(int start, int end) {
+		return substring(0, start).append(substring(end));
+	}
+
+	@Override
 	public AbstractStringBuilder substring(int start) {
 		return substring(start, this.count);
 	}
 
 	@Override
+	public InterfaceStringBuilder relativeSubstring(int start) {
+		return substring(0, start);
+	}
+
+	@Override
 	public AbstractStringBuilder substr(int index, int length) {
 		return new StringBuilders(values, index, index + length);
+	}
+
+	@Override
+	public InterfaceStringBuilder relativeSubstr(int index, int length) {
+		return substring(0, index).append(substring(index + length));
 	}
 
 	@Override
@@ -876,6 +906,47 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
+	public int relativeIndexOf(char ch) {
+		return relativeIndexOf(ch, 0);
+	}
+
+	@Override
+	public int relativeIndexOf(char ch, int offset) {
+		return relativeIndexOf(ch, offset, 0, this.count);
+	}
+
+	@Override
+	public int relativeIndexOf(char ch, int start, int end) {
+		return relativeIndexOf(ch, 0, start, end);
+	}
+
+	@Override
+	public int relativeIndexOf(char ch, int offset, int start, int end) {
+		return relativeIndexOf(0, ch, offset, start, end);
+	}
+
+	@Override
+	public int relativeIndexOf(int position, char ch) {
+		return relativeIndexOf(position, ch, 0);
+	}
+
+	@Override
+	public int relativeIndexOf(int position, char ch, int offset) {
+		return relativeIndexOf(position, ch, offset, 0, this.count);
+	}
+
+
+	@Override
+	public int relativeIndexOf(int position, char ch, int start, int end) {
+		return relativeIndexOf(position, ch, 0, start, end);
+	}
+
+	@Override
+	public int relativeIndexOf(int position, char ch, int offset, int start, int end) {
+		return indexOf(position, ch, offset, start, end) + 1;
+	}
+
+	@Override
 	public int indexOf(String str) {
 		return indexOf(0, str);
 	}
@@ -930,6 +1001,46 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 			}
 		}
 		return -1;
+	}
+
+	@Override
+	public int relativeIndexOf(String str) {
+		return relativeIndexOf(str, 0);
+	}
+
+	@Override
+	public int relativeIndexOf(String str, int offset) {
+		return relativeIndexOf(str, offset, 0, this.count);
+	}
+
+	@Override
+	public int relativeIndexOf(String str, int start, int end) {
+		return relativeIndexOf(str, 0, start, end);
+	}
+
+	@Override
+	public int relativeIndexOf(String str, int offset, int start, int end) {
+		return relativeIndexOf(0, str, offset, start, end);
+	}
+
+	@Override
+	public int relativeIndexOf(int position, String str) {
+		return relativeIndexOf(position, str, 0);
+	}
+
+	@Override
+	public int relativeIndexOf(int position, String str, int offset) {
+		return relativeIndexOf(position, str, offset, 0, this.count);
+	}
+
+	@Override
+	public int relativeIndexOf(int position, String str, int start, int end) {
+		return relativeIndexOf(position, str, 0, start, end);
+	}
+
+	@Override
+	public int relativeIndexOf(int position, String str, int offset, int start, int end) {
+		return indexOf(position, str, offset, start, end) + str.length();
 	}
 
 	@Override
@@ -1039,26 +1150,6 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public int[] indexOfAll(char ch) {
-		List<Integer> list = new ArrayList<>();
-		for (int i = 0; i < count; i++) {
-			if (values[i] == ch) {
-				list.add(i);
-			}
-		}
-		return System.arrayCast(System.listToArray(list), new int[list.size()]);
-	}
-
-	@Override
-	public int[] indexOfAll(String str) {
-		List<Integer> list = new ArrayList<>();
-		for (int i = 0; i != -1; i = indexOf(str, i + str.length())) {
-			list.add(i);
-		}
-		return System.arrayCast(System.listToArray(list), new int[list.size()]);
-	}
-
-	@Override
 	public int lastIndexOf(char ch) {
 		int min = offset;
 
@@ -1093,6 +1184,74 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 			//}
 		}
 		return -1;
+	}
+
+	@Override
+	public int[] indexOfAll(char ch) {
+		return indexOfAll(ch, 0, this.count);
+	}
+
+	@Override
+	public int[] indexOfAll(char ch, int start, int end) {
+		List<Integer> list = new ArrayList<>();
+		for (int i = start; i < end; i++) {
+			if (values[i] == ch) {
+				list.add(i);
+			}
+		}
+		return System.arrayCast(System.listToArray(list), new int[list.size()]);
+	}
+
+	@Override
+	public int[] indexOfAll(String str) {
+		return indexOfAll(str, 0, this.count);
+	}
+
+	@Override
+	public int[] indexOfAll(String str, int start, int end) {
+		List<Integer> list = new ArrayList<>();
+		for (int i = 0; i != -1; i = indexOf(str, i + str.length(), start, end)) {
+			if (i < start) {
+				continue;
+			}
+			list.add(i);
+		}
+		return System.arrayCast(System.listToArray(list), new int[list.size()]);
+	}
+
+	@Override
+	public int[] relativeIndexOfAll(char target) {
+		return relativeIndexOfAll(target, 0, this.count);
+	}
+
+	@Override
+	public int[] relativeIndexOfAll(char ch, int start, int end) {
+		List<Integer> list = new ArrayList<>();
+		for (int i = start; i < end; i++) {
+			if(i == this.count) break;
+			if (values[i] == ch) {
+				list.add(i + 1);
+			}
+		}
+		return System.arrayCast(System.listToArray(list), new int[list.size()]);
+	}
+
+	@Override
+	public int[] relativeIndexOfAll(String target) {
+		return relativeIndexOfAll(target, 0, this.count);
+	}
+
+	@Override
+	public int[] relativeIndexOfAll(String str, int start, int end) {
+		List<Integer> list = new ArrayList<>();
+		for (int i = 0; i != -1; i = indexOf(str, i + str.length(), start, end)) {
+			if((i + str.length()) == this.count) break;
+			if (i < start) {
+				continue;
+			}
+			list.add(i + str.length());
+		}
+		return System.arrayCast(System.listToArray(list), new int[list.size()]);
 	}
 
 	@Override
@@ -1132,6 +1291,16 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public boolean isEmptyOrBlank() {
+		return isEmpty() || isBlank();
+	}
+
+	@Override
+	public boolean isBlankOrEmpty() {
+		return isBlank() || isBlank();
 	}
 
 	@Override
@@ -1370,15 +1539,6 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	// ----- Extra Methods ----- \\
-	@Override
-	public AbstractStringBuilder appendCodePoint(int codePoint) {
-		return append((char) codePoint);
-	}
-
-	@Override
-	public InterfaceStringBuilder appendFirstCodePoint(int codePoint) {
-		return appendFirst((char) codePoint);
-	}
 
 	@Override
 	public InterfaceStringBuilder replace(char target, String replacement) {

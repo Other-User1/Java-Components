@@ -107,6 +107,9 @@ public interface InterfaceStringBuilder {
 	InterfaceStringBuilder[] split(String str, int limit, int offset);
 	InterfaceStringBuilder[] split(String str, int limit, int offset, boolean retainDelimiters);
 
+	InterfaceStringBuilder[] split(int splitIndex, int splitCount);
+	InterfaceStringBuilder[] split(int splitIndex);
+
 	InterfaceStringBuilder join(String delimiter, CharSequence... args);
 	InterfaceStringBuilder join(String delimiter, int limit, CharSequence... args);
 	InterfaceStringBuilder join(String delimiter, String prefixDelimiter, String suffixDelimiter, String prefix, String suffix, int limit, CharSequence... args);
@@ -228,6 +231,16 @@ public interface InterfaceStringBuilder {
 
 	boolean matches(String regex);
 
+	boolean isUpperCase();
+	boolean isUpperCase(Locale locale);
+	boolean isUpperCase(int start, int end);
+	boolean isUpperCase(Locale locale, int start, int end);
+
+	boolean isLowerCase();
+	boolean isLowerCase(Locale locale);
+	boolean isLowerCase(int start, int end);
+	boolean isLowerCase(Locale locale, int start, int end);
+
 	char getCharAt(int index);
 
 	char getFirstChar();
@@ -250,8 +263,9 @@ public interface InterfaceStringBuilder {
 
 	// ----- Extra methods ----- \\
 
-	InterfaceStringBuilder replace(char oldChar, String newChar);
-	InterfaceStringBuilder replace(String oldStr, char newStr);
+	InterfaceStringBuilder replace(char target, String replacement);
+	InterfaceStringBuilder replace(String target, char replacement);
+	InterfaceStringBuilder replace(String target, StringBuilders.Replacement replacement);
 
 	InterfaceStringBuilder[] split(String str, int limit, int offset, int begin, int ending, boolean retainDelimiters);
 }

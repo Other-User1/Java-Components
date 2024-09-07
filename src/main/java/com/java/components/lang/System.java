@@ -77,6 +77,9 @@ public class System {
     }
 
     public static <T> T[] listToArray(List<T> list) {
+        if (list.isEmpty()) {
+            return (T[]) new Object[0];
+        }
         T[] array = (T[]) Array.newInstance(list.getFirst().getClass(), list.size());
         for (int i = 0; i < list.size(); i++) {
             array[i] = list.get(i);

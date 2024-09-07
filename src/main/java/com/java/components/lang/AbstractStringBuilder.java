@@ -14,21 +14,21 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	protected int count;
 
 	public AbstractStringBuilder() {
-		this.values = new char[this.capacity = 1];
+		this.values = new char[this.capacity = 0];
 		this.offset = 0;
 		this.count = 0;
 	}
 
-	public AbstractStringBuilder(char ch) {
-		this.values = new char[this.capacity = 1];
+	public AbstractStringBuilder(char ch, Capacity capacity) {
+		this.values = new char[this.capacity = capacity.getCapacity()];
 		this.values[0] = ch;
 		this.offset = 0;
 		this.count = 0;
 	}
 
-	public AbstractStringBuilder(String str) {
-		this.capacity = 0;
-		this.values = new char[str.length()];
+	public AbstractStringBuilder(String str, Capacity capacity) {
+		this.capacity = capacity.getCapacity();
+		this.values = new char[str.length() + this.capacity];
 		for (int i = 0; i < str.length(); i++) {
 			this.values[i] = str.charAt(i);
 		}
@@ -36,35 +36,38 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		this.count = str.length();
 	}
 
-	public AbstractStringBuilder(String[] values) {
+	public AbstractStringBuilder(String[] values, Capacity capacity) {
 		String str = String.join("", values);
 		char[] chars = str.toCharArray();
 		int length = chars.length;
 		if (values == null) throw new NullPointerException();
-		this.values = new char[length];
+		this.capacity = capacity.getCapacity();
+		this.values = new char[length + this.capacity];
 		this.count = length;
 		this.offset = 0;
 		java.lang.System.arraycopy(chars, 0, this.values, 0, length);
 	}
 
-	public AbstractStringBuilder(String[] values, int offset) {
+	public AbstractStringBuilder(String[] values, int offset, Capacity capacity) {
 		String str = String.join("", values);
 		char[] chars = str.toCharArray();
 		int length = chars.length - offset;
 		if (values == null) throw new NullPointerException();
 		if (offset < 0 || offset > values.length) throw new IndexOutOfBoundsException();
-		this.values = new char[length];
+		this.capacity = capacity.getCapacity();
+		this.values = new char[length + this.capacity];
 		this.count = length;
 		this.offset = offset;
 		java.lang.System.arraycopy(chars, offset, this.values, 0, length);
 	}
 
-	public AbstractStringBuilder(String[] values, int offset, int length) {
+	public AbstractStringBuilder(String[] values, int offset, int length, Capacity capacity) {
 		if (values == null) throw new NullPointerException();
 		if (offset < 0 || offset > values.length) throw new IndexOutOfBoundsException();
 		if (length < 0) throw new IndexOutOfBoundsException();
 		if (offset + length > values.length) throw new IndexOutOfBoundsException(length + " > " + values.length);
-		this.values = new char[length];
+		this.capacity = capacity.getCapacity();
+		this.values = new char[length + this.capacity];
 		this.count = length;
 		this.offset = offset;
 		String str = String.join("", Arrays.copyOfRange(values, offset, length + offset));
@@ -72,12 +75,13 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		java.lang.System.arraycopy(chars, 0, this.values, 0, length);
 	}
 
-	public AbstractStringBuilder(char[] values, int offset, int length) {
+	public AbstractStringBuilder(char[] values, int offset, int length, Capacity capacity) {
 		if (values == null) throw new NullPointerException();
 		if (offset < 0 || offset > values.length) throw new IndexOutOfBoundsException();
 		if (length < 0) throw new IndexOutOfBoundsException();
 		if (offset + length > values.length) throw new IndexOutOfBoundsException(length + " > " + values.length);
-		this.values = new char[length];
+		this.capacity = capacity.getCapacity();
+		this.values = new char[length + this.capacity];
 		this.count = length;
 		this.offset = offset;
 		java.lang.System.arraycopy(values, offset, this.values, 0, length);
@@ -755,6 +759,23 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
+	public AbstractStringBuilder[] split(int splitIndex, int splitCount) {
+		StringBuilders text = new StringBuilders(this.values);
+		int missing = text.length() % splitIndex;
+		StringBuilders[] result = new StringBuilders[splitCount == 0 ? (missing != 0 ? (text.length() / splitIndex) + 1 : text.length() / splitIndex) : splitCount];
+		for (int i = 0; i < result.length; i++) {
+			int j = (i + 1) * splitIndex;
+			result[i] = (StringBuilders) text.substring(i * splitIndex, j < text.length() ? j : text.length());
+		}
+		return result;
+	}
+
+	@Override
+	public InterfaceStringBuilder[] split(int splitIndex) {
+		return split(splitIndex, 0);
+	}
+
+	@Override
 	public AbstractStringBuilder join(String delimiter, CharSequence... args) {
 		return join(delimiter, "", "", "[", "]", -1, args);
 	}
@@ -973,7 +994,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	@Override
 	public int indexOf(int position, String str, int offset) {
-		return indexOf(0, str, offset, 0, this.count);
+		return indexOf(position, str, offset, 0, this.count);
 	}
 
 	@Override
@@ -989,13 +1010,15 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 				continue;
 			}
 			for (int j = 0; j < chars.length; j++) {
-				if (values[i + j] != chars[j]) {
-					break;
-				} else if (j == chars.length - 1) {
-					if (position == 0) {
-						return i;
-					} else {
-						position--;
+				if (i + j < end) {
+					if (values[i + j] != chars[j]) {
+						break;
+					} else if (j == chars.length - 1) {
+						if (position == 0) {
+							return i;
+						} else {
+							position--;
+						}
 					}
 				}
 			}
@@ -1210,10 +1233,22 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public int[] indexOfAll(String str, int start, int end) {
 		List<Integer> list = new ArrayList<>();
-		for (int i = 0; i != -1; i = indexOf(str, i + str.length(), start, end)) {
-			if (i < start) {
+		/*char[] chars = str.toCharArray();
+		for (int i = start + offset; i < end; i++) {
+			if (values[i] != chars[0]) {
 				continue;
 			}
+			for (int j = 0; j < chars.length; j++) {
+				if (i + j < end) {
+					if (values[i + j] != chars[j]) {
+						break;
+					} else if (j == chars.length - 1) {
+						list.add(i);
+					}
+				}
+			}
+		}*/
+		for (int i = start; (i = indexOf(str, i, end)) != -1; i += str.length()) {
 			list.add(i);
 		}
 		return System.arrayCast(System.listToArray(list), new int[list.size()]);
@@ -1228,7 +1263,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	public int[] relativeIndexOfAll(char ch, int start, int end) {
 		List<Integer> list = new ArrayList<>();
 		for (int i = start; i < end; i++) {
-			if(i == this.count) break;
+			if(i == this.count - 1) break;
 			if (values[i] == ch) {
 				list.add(i + 1);
 			}
@@ -1244,11 +1279,23 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public int[] relativeIndexOfAll(String str, int start, int end) {
 		List<Integer> list = new ArrayList<>();
-		for (int i = 0; i != -1; i = indexOf(str, i + str.length(), start, end)) {
-			if((i + str.length()) == this.count) break;
-			if (i < start) {
+		/*char[] chars = str.toCharArray();
+		for (int i = start + offset; i < end; i++) {
+			if (values[i] != chars[0]) {
 				continue;
 			}
+			for (int j = 0; j < chars.length; j++) {
+				if (i + j < end) {
+					if (values[i + j] != chars[j]) {
+						break;
+					} else if (j == chars.length - 1) {
+						int tmp = i + str.length();
+						list.add(tmp);
+					}
+				}
+			}
+		}*/
+		for (int i = start; (i = indexOf(str, i, end)) != -1; i += str.length()) {
 			list.add(i + str.length());
 		}
 		return System.arrayCast(System.listToArray(list), new int[list.size()]);
@@ -1456,6 +1503,68 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
+	public boolean isUpperCase() {
+		return isUpperCase(0, this.count);
+	}
+
+	@Override
+	public boolean isUpperCase(Locale locale) {
+		if (locale == Locale.ENGLISH) {
+			return isUpperCase();
+		}
+		throw new UnsupportedMethodException("isUpperCase(Locale locale) is not supported. Currently only English is supported.");
+	}
+
+	@Override
+	public boolean isUpperCase(int start, int end) {
+		for (int i = start; i < end; i++) {
+			if (!Character.isUpperCase(this.values[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isUpperCase(Locale locale, int start, int end) {
+		if (locale == Locale.ENGLISH) {
+			return isUpperCase(start, end);
+		}
+		throw new UnsupportedMethodException("isUpperCase(Locale locale, int start, int end) is not supported. Currently only English is supported.");
+	}
+
+	@Override
+	public boolean isLowerCase() {
+		return isLowerCase(0, this.count);
+	}
+
+	@Override
+	public boolean isLowerCase(Locale locale) {
+		if (locale == Locale.ENGLISH) {
+			return isLowerCase();
+		}
+		throw new UnsupportedMethodException("isLowerCase(Locale locale) is not supported. Currently only English is supported.");
+	}
+
+	@Override
+	public boolean isLowerCase(int start, int end) {
+		for (int i = start; i < end; i++) {
+			if (!Character.isLowerCase(this.values[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isLowerCase(Locale locale, int start, int end) {
+		if (locale == Locale.ENGLISH) {
+			return isLowerCase(start, end);
+		}
+		throw new UnsupportedMethodException("isLowerCase(Locale locale, int start, int end) is not supported. Currently only English is supported.");
+	}
+
+	@Override
 	public char getCharAt(int index) {
 		if (index < 0) {
 			throw new CompilerTaskException("The 'Index' value (" + index + ") is less than 0", new Throwable[] {
@@ -1548,6 +1657,11 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public InterfaceStringBuilder replace(String target, char replacement) {
 		return replace(target, new StringBuilders(replacement).toString());
+	}
+
+	@Override
+	public InterfaceStringBuilder replace(String target, StringBuilders.Replacement replacement) {
+		return replace(target, replacement.replacement(target));
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.java.components.lang;
 
 public class Operator {
+	@SafeVarargs
 	public static <T> boolean equals(T equalTo, @SuppressWarnings("unchecked") T... args) {
 		for (Object object : args) {
 			if(!equalTo.equals(object)) {

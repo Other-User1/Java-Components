@@ -14,6 +14,7 @@ public class Strings {
 	public Strings(String text) { this.text = text; }
 
 	public Strings() {}
+
 	public String append(String str) {
 		String text = this.text;
 		return text += str;

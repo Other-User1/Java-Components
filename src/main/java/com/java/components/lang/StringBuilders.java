@@ -70,7 +70,11 @@ public non-sealed class StringBuilders extends AbstractStringBuilder {
 		super(strings, offset, length, new Capacity(0));
 	}
 
-	public interface Replacement {
-		String replacement(String target);
+	public StringBuilders(int number) {
+		super(String.valueOf(number), new Capacity(0));
+	}
+
+	public interface OnReplacementListener {
+		String onReplacement(String target, int position);
 	}
 }

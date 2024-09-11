@@ -5,8 +5,6 @@ import com.java.components.lang.exception.UnsupportedMethodException;
 
 import java.util.*;
 
-import static com.java.components.Prints.println;
-
 public sealed abstract class AbstractStringBuilder implements InterfaceStringBuilder permits StringBuilders {
 	protected char[] values;
 	protected int capacity;
@@ -118,7 +116,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	private void expandCapacity(int minCapacity) {
-		this.values = new char[minCapacity];
+		this.values = new char[minCapacity + this.capacity];
 	}
 
 	@Override
@@ -284,12 +282,12 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder appendFirstCodePoint(int codePoint) {
+	public AbstractStringBuilder appendFirstCodePoint(int codePoint) {
 		return appendFirst((char) codePoint);
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, String str) {
+	public AbstractStringBuilder insert(int index, String str) {
 		char[] oldCharacters = this.values;
 		char[] valuesStr = str.toCharArray();
 		expandCapacity(this.values.length + str.length());
@@ -305,7 +303,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, char ch) {
+	public AbstractStringBuilder insert(int index, char ch) {
 		char[] oldCharacters = this.values;
 		expandCapacity(this.values.length + 1);
 		for (int i = 0, j = 0; j < oldCharacters.length; i++, j++) {
@@ -319,37 +317,37 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, byte b) {
+	public AbstractStringBuilder insert(int index, byte b) {
 		return insert(index, String.valueOf(b));
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, short s) {
+	public AbstractStringBuilder insert(int index, short s) {
 		return insert(index, String.valueOf(s));
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, int i) {
+	public AbstractStringBuilder insert(int index, int i) {
 		return insert(index, String.valueOf(i));
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, long l) {
+	public AbstractStringBuilder insert(int index, long l) {
 		return insert(index, String.valueOf(l));
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, float f) {
+	public AbstractStringBuilder insert(int index, float f) {
 		return insert(index, String.valueOf(f));
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, double d) {
+	public AbstractStringBuilder insert(int index, double d) {
 		return insert(index, String.valueOf(d));
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, boolean b) {
+	public AbstractStringBuilder insert(int index, boolean b) {
 		if (b) {
 			insert(index, 't');
 			insert(index + 1, 'r');
@@ -366,12 +364,12 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder insert(int index, Object obj) {
+	public AbstractStringBuilder insert(int index, Object obj) {
 		return insert(index, String.valueOf(obj));
 	}
 
 	@Override
-	public InterfaceStringBuilder insertCodePoint(int index, int codePoint) {
+	public AbstractStringBuilder insertCodePoint(int index, int codePoint) {
 		return insert(0, (char) codePoint);
 	}
 
@@ -395,7 +393,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder replace(String target, String replacement, int start, int end) {
+	public AbstractStringBuilder replace(String target, String replacement, int start, int end) {
 		return replace(target, 0, replacement, length(), start, end);
 	}
 
@@ -489,22 +487,22 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder replaceFirst(char target, char replacement) {
+	public AbstractStringBuilder replaceFirst(char target, char replacement) {
 		return replaceFirst(target, 0, replacement);
 	}
 
 	@Override
-	public InterfaceStringBuilder replaceFirst(char target,  int position, char replacement) {
+	public AbstractStringBuilder replaceFirst(char target,  int position, char replacement) {
 		return replace(target, position, replacement, 1);
 	}
 
 	@Override
-	public InterfaceStringBuilder replaceLast(char target, char replacement) {
+	public AbstractStringBuilder replaceLast(char target, char replacement) {
 		return replaceLast(target, 0, replacement);
 	}
 
 	@Override
-	public InterfaceStringBuilder replaceLast(char target, int position, char replacement) {
+	public AbstractStringBuilder replaceLast(char target, int position, char replacement) {
 		int index = reverseIndexOf(position, target);
 		return (index != -1) ? replace(index, index + 1, replacement) : this;
 	}
@@ -516,7 +514,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder relativeSubstring(int start, int end) {
+	public AbstractStringBuilder relativeSubstring(int start, int end) {
 		return substring(0, start).append(substring(end));
 	}
 
@@ -526,8 +524,24 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder relativeSubstring(int start) {
-		return substring(0, start);
+	public AbstractStringBuilder relativeSubstring(int end) {
+		return substring(0, end);
+	}
+
+	@Override
+	public AbstractStringBuilder substring(String target) {
+		if (contains(target)) {
+			return new StringBuilders(target);
+		}
+		return this;
+	}
+
+	@Override
+	public AbstractStringBuilder relativeSubstring(String target) {
+		if (contains(target)) {
+			return substring(0, indexOf(target)).append(substring(indexOf(target) + target.length()));
+		}
+		return this;
 	}
 
 	@Override
@@ -536,7 +550,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder relativeSubstr(int index, int length) {
+	public AbstractStringBuilder relativeSubstr(int index, int length) {
 		return substring(0, index).append(substring(index + length));
 	}
 
@@ -632,32 +646,32 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder toUpperCase(Locale locale, int start, int end) {
+	public AbstractStringBuilder toUpperCase(Locale locale, int start, int end) {
 		throw new UnsupportedMethodException("toUpperCase(Locale locale, int start, int end) is not supported, missing implementation for all languages");
 	}
 
 	@Override
-	public InterfaceStringBuilder[] split(char ch) {
+	public AbstractStringBuilder[] split(char ch) {
 		return split(ch, 99999999, 0, false);
 	}
 
 	@Override
-	public InterfaceStringBuilder[] split(char ch, boolean retainDelimiters) {
+	public AbstractStringBuilder[] split(char ch, boolean retainDelimiters) {
 		return split(ch, 99999999, 0, retainDelimiters);
 	}
 
 	@Override
-	public InterfaceStringBuilder[] split(char ch, int limit) {
+	public AbstractStringBuilder[] split(char ch, int limit) {
 		return split(ch, limit, 0, false);
 	}
 
 	@Override
-	public InterfaceStringBuilder[] split(char ch, int limit, boolean retainDelimiters) {
+	public AbstractStringBuilder[] split(char ch, int limit, boolean retainDelimiters) {
 		return split(ch, limit, 0, retainDelimiters);
 	}
 
 	@Override
-	public InterfaceStringBuilder[] split(char ch, int limit, int offset) {
+	public AbstractStringBuilder[] split(char ch, int limit, int offset) {
 		return split(ch, limit, offset, false);
 	}
 
@@ -771,7 +785,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public InterfaceStringBuilder[] split(int splitIndex) {
+	public AbstractStringBuilder[] split(int splitIndex) {
 		return split(splitIndex, 0);
 	}
 
@@ -805,13 +819,14 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	public AbstractStringBuilder repeat(int count) {
 		count++;
 		char[] oldValues = this.values;
-		expandCapacity(count * oldValues.length);
+		expandCapacity(count * oldValues.length - this.capacity);
 		for (int i = 0, j = 0; i < values.length; i++, j++) {
 			if (j == oldValues.length) {
 				j = 0;
 			}
 			this.values[i] = oldValues[j];
 		}
+		this.count = count * oldValues.length - (this.capacity * count);
 		return this;
 	}
 
@@ -832,84 +847,37 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	@Override
 	public int indexOf(char ch) {
-		for (int i = 0; i < count; i++) {
-			if (values[i] == ch) {
-				return i;
-			}
-		}
-		return -1;
+		return indexOf(ch, 0);
 	}
 
 	@Override
 	public int indexOf(char ch, int offset) {
-		for (int i = offset; i < count; i++) {
-			if (values[i] == ch) {
-				return i;
-			}
-		}
-		return -1;
+		return indexOf(ch, offset, 0, this.count);
 	}
 
 	@Override
 	public int indexOf(char ch, int start, int end) {
-		for (int i = start; i < end; i++) {
-			if (values[i] == ch) {
-				return i;
-			}
-		}
-		return -1;
+		return indexOf(ch, 0, start, end);
 	}
 
 	@Override
 	public int indexOf(char ch, int offset, int start, int end) {
-		for (int i = start + offset; i < end; i++) {
-			if (values[i] == ch) {
-				return i;
-			}
-		}
-		return -1;
+		return indexOf(0, ch, offset, start, end);
 	}
 
 	@Override
 	public int indexOf(int position, char ch) {
-		for (int i = 0; i < count; i++) {
-			if (values[i] == ch) {
-				if (position == 0) {
-					return i;
-				} else {
-					position--;
-				}
-			}
-		}
-		return -1;
+		return indexOf(position, ch, 0);
 	}
 
 	@Override
 	public int indexOf(int position, char ch, int offset) {
-		for (int i = offset; i < count; i++) {
-			if (values[i] == ch) {
-				if (position == 0) {
-					return i;
-				} else {
-					position--;
-				}
-			}
-		}
-		return -1;
+		return indexOf(position, ch, offset, 0, this.count);
 	}
 
 	@Override
 	public int indexOf(int position, char ch, int start, int end) {
-		for (int i = start; i < end; i++) {
-			if (values[i] == ch) {
-				if (position == 0) {
-					return i;
-				} else {
-					position--;
-				}
-			}
-		}
-		return -1;
+		return indexOf(position, ch, 0, start, end);
 	}
 
 	@Override
@@ -1302,13 +1270,13 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public int size() {
+	public int size() { // the count is real size of "characters" (without the "capacity") in the string
 		return count;
 	}
 
 	@Override
-	public int length() {
-		return count;
+	public int length() { // the count is real size of "characters" with the "capacity" in the string
+		return values.length;
 	}
 
 	@Override
@@ -1326,6 +1294,16 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
+	public boolean isNull() {
+		return this.values == null;
+	}
+
+	@Override
+	public boolean isVoid() {
+		return (this.count + this.capacity) == 0;
+	}
+
+	@Override
 	public boolean isEmpty() {
 		return this.count == 0;
 	}
@@ -1338,16 +1316,6 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public boolean isEmptyOrBlank() {
-		return isEmpty() || isBlank();
-	}
-
-	@Override
-	public boolean isBlankOrEmpty() {
-		return isBlank() || isBlank();
 	}
 
 	@Override
@@ -1512,7 +1480,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		if (locale == Locale.ENGLISH) {
 			return isUpperCase();
 		}
-		throw new UnsupportedMethodException("isUpperCase(Locale locale) is not supported. Currently only English is supported.");
+		throw new UnsupportedMethodException("isUpperCase(Locale) is not supported. Currently only English is supported.");
 	}
 
 	@Override
@@ -1530,7 +1498,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		if (locale == Locale.ENGLISH) {
 			return isUpperCase(start, end);
 		}
-		throw new UnsupportedMethodException("isUpperCase(Locale locale, int start, int end) is not supported. Currently only English is supported.");
+		throw new UnsupportedMethodException("isUpperCase(Locale, int, int) is not supported. Currently only English is supported.");
 	}
 
 	@Override
@@ -1543,7 +1511,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		if (locale == Locale.ENGLISH) {
 			return isLowerCase();
 		}
-		throw new UnsupportedMethodException("isLowerCase(Locale locale) is not supported. Currently only English is supported.");
+		throw new UnsupportedMethodException("isLowerCase(Locale) is not supported. Currently only English is supported.");
 	}
 
 	@Override
@@ -1561,7 +1529,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		if (locale == Locale.ENGLISH) {
 			return isLowerCase(start, end);
 		}
-		throw new UnsupportedMethodException("isLowerCase(Locale locale, int start, int end) is not supported. Currently only English is supported.");
+		throw new UnsupportedMethodException("isLowerCase(Locale, int, int) is not supported. Currently only English is supported.");
 	}
 
 	@Override
@@ -1581,6 +1549,12 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	@Override
 	public char getFirstChar() {
 		return this.values[0];
+	}
+
+	@Override
+	@Deprecated(since = "Use getCharAt(int)")
+	public char getMiddleChar() {
+		return this.values[this.count / 2];
 	}
 
 	@Override
@@ -1650,18 +1624,29 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	// ----- Extra Methods ----- \\
 
 	@Override
-	public InterfaceStringBuilder replace(char target, String replacement) {
+	public AbstractStringBuilder replace(char target, String replacement) {
 		return replace(new StringBuilders(target).toString(), replacement);
 	}
 
 	@Override
-	public InterfaceStringBuilder replace(String target, char replacement) {
+	public AbstractStringBuilder replace(String target, char replacement) {
 		return replace(target, new StringBuilders(replacement).toString());
 	}
 
 	@Override
-	public InterfaceStringBuilder replace(String target, StringBuilders.Replacement replacement) {
-		return replace(target, replacement.replacement(target));
+	public AbstractStringBuilder replace(String target, StringBuilders.OnReplacementListener onReplacementListener) {
+		StringBuilders sb = new StringBuilders();
+		int start = 0;
+		int end;
+		int position = 0;
+		while ((end = indexOf(target, start)) != -1) {
+			sb.append(substring(start, end));
+			sb.append(onReplacementListener.onReplacement(target, position));
+			position++;
+			start = end + target.length();
+		}
+		sb.append(substring(start));
+		return sb;
 	}
 
 	@Override

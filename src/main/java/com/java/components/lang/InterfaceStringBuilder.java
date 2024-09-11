@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-public interface InterfaceStringBuilder {
+interface InterfaceStringBuilder {
 	InterfaceStringBuilder setCharAt(int index, char ch);
 	InterfaceStringBuilder setChatAtCodePoint(int index, int codePoint);
 
@@ -74,6 +74,8 @@ public interface InterfaceStringBuilder {
 	InterfaceStringBuilder relativeSubstring(int start, int end);
 	InterfaceStringBuilder substring(int start);
 	InterfaceStringBuilder relativeSubstring(int start);
+	InterfaceStringBuilder substring(String target);
+	InterfaceStringBuilder relativeSubstring(String target);
 	InterfaceStringBuilder substr(int index, int length);
 	InterfaceStringBuilder relativeSubstr(int index, int length);
 	InterfaceStringBuilder slide(int start, int end);
@@ -195,10 +197,10 @@ public interface InterfaceStringBuilder {
 
 	int getCharAtCodePoint(int index);
 
+	boolean isNull();
+	boolean isVoid();
 	boolean isEmpty();
 	boolean isBlank();
-	boolean isEmptyOrBlank();
-	boolean isBlankOrEmpty();
 
 	boolean equal(AbstractStringBuilder abs);
 	boolean equalIgnoreCase(AbstractStringBuilder abs);
@@ -244,6 +246,7 @@ public interface InterfaceStringBuilder {
 	char getCharAt(int index);
 
 	char getFirstChar();
+	char getMiddleChar();
 	char getLastChar();
 
 	String toString();
@@ -265,7 +268,7 @@ public interface InterfaceStringBuilder {
 
 	InterfaceStringBuilder replace(char target, String replacement);
 	InterfaceStringBuilder replace(String target, char replacement);
-	InterfaceStringBuilder replace(String target, StringBuilders.Replacement replacement);
+	InterfaceStringBuilder replace(String target, StringBuilders.OnReplacementListener onReplacementListener);
 
 	InterfaceStringBuilder[] split(String str, int limit, int offset, int begin, int ending, boolean retainDelimiters);
 }

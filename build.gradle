@@ -1,9 +1,12 @@
 plugins {
     id 'java'
+	id 'org.jetbrains.kotlin.jvm'
 }
 
 group = 'com.example.code'
-version = '1.0-SNAPSHOT'
+def versionName = 'SNAPSHOT beta'
+def versionCode = '1.0'
+version = versionCode + '-' + versionName
 
 repositories {
     mavenCentral()
@@ -13,6 +16,7 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     implementation 'org.jetbrains:annotations:23.0.0'
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
 }
 
@@ -26,4 +30,8 @@ tasks.withType(JavaExec) {
 
 test {
     useJUnitPlatform()
+}
+
+kotlin {
+	jvmToolchain(21)
 }

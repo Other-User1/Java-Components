@@ -1,21 +1,26 @@
 package com.example.code;
 
 import com.java.components.lang.StringBuilders;
-import com.java.components.util.Formatter;
 
 import static com.java.components.Prints.println;
 
+
 public class Main {
-	public static void main(String[] args) {
-		StringBuilders stringBuilders = new StringBuilders("Hello World, for World!"); // custom class
-		println(stringBuilders.replace("World", new StringBuilders.OnReplacementListener() {
+	static String text = "Hello from World, for World; in the World!";
+
+	public static void main() {
+		StringBuilders stringBuilders = new StringBuilders(text);
+		println(stringBuilders.replace(new StringBuilders.OnTargetListener() {
 			@Override
-			public String onReplacement(String target, int position) {
-				if (position == 1) {
-					return "Planet";
+			public String onTarget(String text) {
+				if (text.contains("from")) {
+					return "from";
+				} else if (text.contains("in")) {
+					return "in";
+				} else {
+					return "";
 				}
-				return "Java";
 			}
-		})); // output: Hello Java, for Planet!
+		}, "Test"));
 	}
 }

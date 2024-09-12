@@ -1,10 +1,28 @@
 package com.java.components.lang;
 
+import com.java.components.lang.exception.NullPointerException;
 import com.java.components.lang.exception.NumberNegativeException;
 import com.java.components.lang.exception.UnsupportedMethodException;
 
 import java.util.*;
 
+import static com.java.components.Prints.println;
+
+/**
+ * <H1>AbstractStringBuilder</H1>
+ * el "<strong>AbstractStringBuilder</strong>" es una clase que se utiliza
+ * para dar una "construccion" de cadenas de manera eficiente
+ * por ejemplo:
+ * <pre>
+ *     <code>
+ *         StringBuilders stringBuilders = new StringBuilders("Hello World");
+ *         stringBuilders.append("!");
+ *         System.out.println(stringBuilders);
+ *     </code>
+ * </pre>
+ * en este ejemplo de crea
+ */
+@SuppressWarnings("all")
 public sealed abstract class AbstractStringBuilder implements InterfaceStringBuilder permits StringBuilders {
 	protected char[] values;
 	protected int capacity;
@@ -1640,10 +1658,43 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		int end;
 		int position = 0;
 		while ((end = indexOf(target, start)) != -1) {
+			if (onReplacementListener.onReplacement(target, position).equals("\0")) {
+				throw new CompilerTaskException("The 'onReplacementListener' returns a null value", new NullPointerException());
+			}
 			sb.append(substring(start, end));
 			sb.append(onReplacementListener.onReplacement(target, position));
 			position++;
 			start = end + target.length();
+		}
+		sb.append(substring(start));
+		return sb;
+	}
+
+	@Override
+	public AbstractStringBuilder replace(char target, StringBuilders.OnReplacementListener onReplacementListener) {
+		StringBuilders sb = new StringBuilders();
+		for (int i = 0, j = 0; i < this.count; i++, ++j) {
+			if (this.values[i] == target) {
+				if (onReplacementListener.onReplacement(target, j) == '\0') {
+					throw new CompilerTaskException("The 'onReplacementListener' returns a null value", new NullPointerException());
+				}
+				this.values[i] = onReplacementListener.onReplacement(target, j);
+			}
+		}
+		return sb;
+	}
+
+	@Override
+	public InterfaceStringBuilder replace(StringBuilders.OnTargetListener onTargetListener, String replacement) {
+		StringBuilders sb = new StringBuilders();
+		int start = 0;
+		int end;
+		int position = 0;
+		while ((end = indexOf(onTargetListener.onTarget(new String(this.values)), start)) != -1) {
+			sb.append(substring(start, end));
+			sb.append(replacement);
+			position++;
+			start = end + onTargetListener.onTarget(new String(this.values)).length();
 		}
 		sb.append(substring(start));
 		return sb;

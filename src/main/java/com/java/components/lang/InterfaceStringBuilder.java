@@ -268,7 +268,11 @@ interface InterfaceStringBuilder {
 
 	InterfaceStringBuilder replace(char target, String replacement);
 	InterfaceStringBuilder replace(String target, char replacement);
+
+	InterfaceStringBuilder replace(char target, StringBuilders.OnReplacementListener onReplacementListener);
 	InterfaceStringBuilder replace(String target, StringBuilders.OnReplacementListener onReplacementListener);
+
+	InterfaceStringBuilder replace(StringBuilders.OnTargetListener onTargetListener, String replacement);
 
 	InterfaceStringBuilder[] split(String str, int limit, int offset, int begin, int ending, boolean retainDelimiters);
 }

@@ -1686,19 +1686,17 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 
 	@Override
 	public InterfaceStringBuilder replace(StringBuilders.OnTargetListener onTargetListener, String replacement) {
-		StringBuilders sb = new StringBuilders();
-		int start = 0;
-		int end;
-		int position = 0;
-		while ((end = indexOf(onTargetListener.onTarget(new String(this.values)), start)) != -1) {
-			sb.append(substring(start, end));
-			sb.append(replacement);
-			position++;
-			start = end + onTargetListener.onTarget(new String(this.values)).length();
+		StringBuilders sb = new StringBuilders(this.values);
+		String tmp = new String(this.values);
+		String target = onTargetListener.onTarget(tmp);
+		while (!target.equals("")) {
+			sb = (StringBuilders) sb.replace(target, replacement);
+			tmp = sb.toString();
+			target = onTargetListener.onTarget(tmp);
 		}
-		sb.append(substring(start));
 		return sb;
 	}
+
 
 	@Override
 	public AbstractStringBuilder[] split(String str, int limit, int offset, int begin, int ending, boolean retainDelimiters) {

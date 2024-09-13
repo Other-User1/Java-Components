@@ -144,10 +144,10 @@ public non-sealed class StringBuilders extends AbstractStringBuilder {
 	}
 
 	public abstract static class OnTargetListener {
-		public String onTarget(String text) { return "\0"; }
+		public String onTarget(String text) { return ""; }
 	}
 
-	public abstract static class OnTargetListener2 {
-		public char onTarget(String text) { return '\0'; }
+	public abstract static class OnTargetCharListener {
+		public char[] onTarget(String text) { return new char[0]; }
 	}
 }

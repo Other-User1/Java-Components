@@ -92,7 +92,7 @@ public class Prints {
 		return new Prints();
 	}
 
-	public static Prints println(Object obj) {return println(obj.toString());}
+	public static Prints println(Object obj) {return println(String.valueOf(obj));}
 
 	public static Prints println(Boolean bool) {return println(bool.toString());}
 

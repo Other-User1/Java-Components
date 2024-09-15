@@ -1,5 +1,7 @@
 package com.java.components.lang;
 
+import java.util.Arrays;
+
 import static com.java.components.Prints.println;
 
 /**
@@ -44,14 +46,13 @@ import static com.java.components.Prints.println;
  * como obtener la <strong>sub-cadena</strong> por media de <code>StringBuilders.substring(int)</code> o <code>StringBuilders.substring(int, int)</code>
  * y replazar cadenas por medio de un "<strong>target</strong>" usando el metodo <code>StringBuilders.replace(String, String)</code>
  *
- *
  * @see com.java.components.lang.AbstractStringBuilder
  * @see com.java.components.lang.AbstractStringBuilder
  * @see java.lang.String
  * @see java.lang.StringBuilder
  * @see java.lang.StringBuffer
  *
- * @sincejava 1.8
+ * @since-java 1.8
  *
  * @version 1.0
  *
@@ -138,16 +139,24 @@ public non-sealed class StringBuilders extends AbstractStringBuilder {
 		super(String.valueOf(number), capacity);
 	}
 
+	public StringBuilders(boolean bool) {
+		super(String.valueOf(bool), new Capacity(0));
+	}
+
+	public StringBuilders(boolean bool, Capacity capacity) {
+		super(String.valueOf(bool), capacity);
+	}
+
 	public interface OnReplacementListener {
 		default String onReplacement(String target, final int position) { return "\0"; };
 		default char onReplacement(char target, final int position) { return '\0'; }
 	}
 
-	public abstract static class OnTargetListener {
-		public String onTarget(String text) { return ""; }
+	public interface OnTargetListener {
+		public String onTarget(String text);
 	}
 
-	public abstract static class OnTargetCharListener {
-		public char[] onTarget(String text) { return new char[0]; }
+	public interface OnTargetCharListener {
+		public char onTarget(String text);
 	}
 }

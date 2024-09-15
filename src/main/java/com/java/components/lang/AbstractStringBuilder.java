@@ -3,25 +3,11 @@ package com.java.components.lang;
 import com.java.components.lang.exception.NullPointerException;
 import com.java.components.lang.exception.NumberNegativeException;
 import com.java.components.lang.exception.UnsupportedMethodException;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static com.java.components.Prints.println;
-
-/**
- * <H1>AbstractStringBuilder</H1>
- * el "<strong>AbstractStringBuilder</strong>" es una clase que se utiliza
- * para dar una "construccion" de cadenas de manera eficiente
- * por ejemplo:
- * <pre>
- *     <code>
- *         StringBuilders stringBuilders = new StringBuilders("Hello World");
- *         stringBuilders.append("!");
- *         System.out.println(stringBuilders);
- *     </code>
- * </pre>
- * en este ejemplo de crea
- */
 @SuppressWarnings("all")
 public sealed abstract class AbstractStringBuilder implements InterfaceStringBuilder permits StringBuilders {
 	protected char[] values;
@@ -29,20 +15,21 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	protected int offset;
 	protected int count;
 
+	@Contract(pure = true)
 	public AbstractStringBuilder() {
 		this.values = new char[this.capacity = 0];
 		this.offset = 0;
 		this.count = 0;
 	}
 
-	public AbstractStringBuilder(char ch, Capacity capacity) {
+	public AbstractStringBuilder(char ch, @NotNull Capacity capacity) {
 		this.values = new char[this.capacity = capacity.getCapacity()];
 		this.values[0] = ch;
 		this.offset = 0;
 		this.count = 0;
 	}
 
-	public AbstractStringBuilder(String str, Capacity capacity) {
+	public AbstractStringBuilder(@NotNull String str, @NotNull Capacity capacity) {
 		this.capacity = capacity.getCapacity();
 		this.values = new char[str.length() + this.capacity];
 		for (int i = 0; i < str.length(); i++) {
@@ -56,7 +43,9 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		String str = String.join("", values);
 		char[] chars = str.toCharArray();
 		int length = chars.length;
-		if (values == null) throw new NullPointerException();
+		if (values == null) {
+			throw new NullPointerException();
+		}
 		this.capacity = capacity.getCapacity();
 		this.values = new char[length + this.capacity];
 		this.count = length;
@@ -68,8 +57,12 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		String str = String.join("", values);
 		char[] chars = str.toCharArray();
 		int length = chars.length - offset;
-		if (values == null) throw new NullPointerException();
-		if (offset < 0 || offset > values.length) throw new IndexOutOfBoundsException();
+		if (values == null) {
+			throw new NullPointerException();
+		}
+		if (offset < 0 || offset > values.length) {
+			throw new IndexOutOfBoundsException();
+		}
 		this.capacity = capacity.getCapacity();
 		this.values = new char[length + this.capacity];
 		this.count = length;
@@ -77,11 +70,20 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		java.lang.System.arraycopy(chars, offset, this.values, 0, length);
 	}
 
+	@Contract("null, _, _, _ -> fail")
 	public AbstractStringBuilder(String[] values, int offset, int length, Capacity capacity) {
-		if (values == null) throw new NullPointerException();
-		if (offset < 0 || offset > values.length) throw new IndexOutOfBoundsException();
-		if (length < 0) throw new IndexOutOfBoundsException();
-		if (offset + length > values.length) throw new IndexOutOfBoundsException(length + " > " + values.length);
+		if (values == null) {
+			throw new NullPointerException();
+		}
+		if (offset < 0 || offset > values.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (length < 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (offset + length > values.length) {
+			throw new IndexOutOfBoundsException(length + " > " + values.length);
+		}
 		this.capacity = capacity.getCapacity();
 		this.values = new char[length + this.capacity];
 		this.count = length;
@@ -91,11 +93,20 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		java.lang.System.arraycopy(chars, 0, this.values, 0, length);
 	}
 
+	@Contract("null, _, _, _ -> fail")
 	public AbstractStringBuilder(char[] values, int offset, int length, Capacity capacity) {
-		if (values == null) throw new NullPointerException();
-		if (offset < 0 || offset > values.length) throw new IndexOutOfBoundsException();
-		if (length < 0) throw new IndexOutOfBoundsException();
-		if (offset + length > values.length) throw new IndexOutOfBoundsException(length + " > " + values.length);
+		if (values == null) {
+			throw new NullPointerException();
+		}
+		if (offset < 0 || offset > values.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (length < 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (offset + length > values.length) {
+			throw new IndexOutOfBoundsException(length + " > " + values.length);
+		}
 		this.capacity = capacity.getCapacity();
 		this.values = new char[length + this.capacity];
 		this.count = length;
@@ -133,6 +144,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		return this;
 	}
 
+	@Contract(mutates = "this")
 	private void expandCapacity(int minCapacity) {
 		this.values = new char[minCapacity + this.capacity];
 	}
@@ -242,7 +254,9 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		for (int i = 0; i < str.length(); i++) {
 			this.values[i] = str.charAt(i);
 		}
-		if (this.count >= 0) java.lang.System.arraycopy(oldCharacters, 0, this.values, str.length(), this.count);
+		if (this.count >= 0) {
+			java.lang.System.arraycopy(oldCharacters, 0, this.values, str.length(), this.count);
+		}
 		this.count += str.length();
 		return this;
 	}
@@ -305,7 +319,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 	}
 
 	@Override
-	public AbstractStringBuilder insert(int index, String str) {
+	public AbstractStringBuilder insert(int index, @NotNull String str) {
 		char[] oldCharacters = this.values;
 		char[] valuesStr = str.toCharArray();
 		expandCapacity(this.values.length + str.length());
@@ -1689,7 +1703,7 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		StringBuilders sb = new StringBuilders(this.values);
 		String tmp = new String(this.values);
 		String target = onTargetListener.onTarget(tmp);
-		while (!target.equals("")) {
+		while (!target.equals("\0")) {
 			sb = (StringBuilders) sb.replace(target, replacement);
 			tmp = sb.toString();
 			target = onTargetListener.onTarget(tmp);
@@ -1697,6 +1711,29 @@ public sealed abstract class AbstractStringBuilder implements InterfaceStringBui
 		return sb;
 	}
 
+	@Override
+	public InterfaceStringBuilder replace(StringBuilders.OnTargetCharListener onTargetCharListener, char replacement) {
+		StringBuilders sb = new StringBuilders(this.values);
+		String tmp = new String(this.values);
+		char target = onTargetCharListener.onTarget(tmp);
+		while (target != '\0') {
+			sb = (StringBuilders) sb.replace(target, replacement);
+			tmp = sb.toString();
+			target = onTargetCharListener.onTarget(tmp);
+		}
+		return sb;
+	}
+
+	@Override
+	public InterfaceStringBuilder replace(StringBuilders.OnTargetListener onTargetListener, StringBuilders.OnReplacementListener onReplacementListener) {
+		StringBuilders sb = new StringBuilders(this.values);
+		String target = onTargetListener.onTarget(sb.toString());
+		while (!target.equals("")) {
+			sb = (StringBuilders) sb.replace(target, onReplacementListener);
+			target = onTargetListener.onTarget(sb.toString());
+		}
+		return sb;
+	}
 
 	@Override
 	public AbstractStringBuilder[] split(String str, int limit, int offset, int begin, int ending, boolean retainDelimiters) {

@@ -273,6 +273,9 @@ interface InterfaceStringBuilder {
 	InterfaceStringBuilder replace(String target, StringBuilders.OnReplacementListener onReplacementListener);
 
 	InterfaceStringBuilder replace(StringBuilders.OnTargetListener onTargetListener, String replacement);
+	InterfaceStringBuilder replace(StringBuilders.OnTargetCharListener onTargetCharListener, char replacement);
+
+	InterfaceStringBuilder replace(StringBuilders.OnTargetListener onTargetListener, StringBuilders.OnReplacementListener onReplacementListener);
 
 	InterfaceStringBuilder[] split(String str, int limit, int offset, int begin, int ending, boolean retainDelimiters);
 }

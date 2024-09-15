@@ -9,6 +9,7 @@ public class Main {
 
 	@Contract(pure = true)
 	public static void main(String[] args) {
-		println(STR."test");
+		StringBuilders STR = new StringBuilders();
+		println(STR.append("Hello").append("World").toString());
 	}
 }
